@@ -50,8 +50,23 @@ function setup() {
   toolSelect.option('Ellipse');
   toolSelect.changed(changeTool);
 
-  colorSelect = createColorPicker('#000000');
-  thicknessSelect = createSlider(0, 10, 1);
+  thicknessSelect = createSelect();
+  thicknessSelect.option('5');
+  thicknessSelect.option('10');
+  thicknessSelect.option('15');
+  thicknessSelect.option('20');
+
+
+  colorSelect = createColorPicker('#000000'); // for border color
+  colorSelect.input(() => console.log('Border color changed:', colorSelect.color()));
+
+  fillColorSelect = createColorPicker('#ffffff'); // for fill color
+  fillColorSelect.input(() => console.log('Fill color changed:', fillColorSelect.color()));
+
+  let resetButton = createButton('Reset');
+  resetButton.mousePressed(resetSketch);
+
+  // thicknessSelect = createSlider(0, 10, 1);
 
 }
 
@@ -88,6 +103,19 @@ function draw() {
 
 }
 
+function resetSketch() {
+  items = []; // Clear all stamps and shapes
+  filterType = 'NORMAL'; // Reset the active filter
+  filterSelect.selected('No Filter'); // Reset the filter dropdown menu
+  currentStamp = null; // Clear the current stamp
+  stampSelect.selected('No Stamp'); // Reset the stamp dropdown menu
+  currentTool = null; // Clear the current tool
+  toolSelect.selected('No Tool'); // Reset the tool dropdown menu
+  currentShape = null; // Clear the current shape
+  thicknessSelect.selected('1'); // Reset the thickness dropdown menu
+  colorSelect.value('#000000'); // Reset the border color picker
+  fillColorSelect.value('#ffffff'); // Reset the fill color picker
+}
 function changeFilter() {
   filterType = filterSelect.value();
 }
@@ -121,6 +149,28 @@ function changeStamp() {
 //   }
 // }
 
+// function mousePressed() {
+//   if (mouseX >= (windowWidth - 640) / 2 && mouseX <= (windowWidth + 640) / 2 && mouseY >= (windowHeight - 480) / 2 && mouseY <= (windowHeight + 480) / 2) {
+//     if (currentStamp) {
+//       items.push({
+//         type: 'stamp',
+//         image: currentStamp,
+//         x: mouseX,
+//         y: mouseY
+//       });
+//     } else if (currentTool) {
+//       currentShape = {
+//         type: currentTool,
+//         x1: mouseX,
+//         y1: mouseY,
+//         x2: mouseX,
+//         y2: mouseY,
+//         color: colorSelect.color(),
+//         thickness: thicknessSelect.value()
+//       };
+//     }
+//   }
+// }
 function mousePressed() {
   if (mouseX >= (windowWidth - 640) / 2 && mouseX <= (windowWidth + 640) / 2 && mouseY >= (windowHeight - 480) / 2 && mouseY <= (windowHeight + 480) / 2) {
     if (currentStamp) {
@@ -131,6 +181,9 @@ function mousePressed() {
         y: mouseY
       });
     } else if (currentTool) {
+      console.log('Border color:', colorSelect.color());
+      console.log('Fill color:', fillColorSelect.color());
+  
       currentShape = {
         type: currentTool,
         x1: mouseX,
@@ -138,11 +191,16 @@ function mousePressed() {
         x2: mouseX,
         y2: mouseY,
         color: colorSelect.color(),
-        thickness: thicknessSelect.value()
+        fillColor: fillColorSelect.value(), // Use the value() function
+        thickness: thicknessSelect.value(), // Use the value() function
+        thickness: parseInt(thicknessSelect.value()),
+  
+    
       };
     }
   }
 }
+
 
 function mouseDragged() {
   if (currentShape) {
@@ -162,19 +220,53 @@ function changeTool() {
   currentTool = toolSelect.value() === 'No Tool' ? null : toolSelect.value();
 }
 
+// function drawShape(shape) {
+//   stroke(shape.color);
+//   strokeWeight(shape.thickness);
+//   if (shape.type === 'Rectangle') {
+//     rect(shape.x1, shape.y1, shape.x2 - shape.x1, shape.y2 - shape.y1);
+//   } else if (shape.type === 'Ellipse') {
+//     ellipse(shape.x1, shape.y1, shape.x2 - shape.x1, shape.y2 - shape.y1);
+//   }
+// }
+// function drawShape(shape) {
+//   stroke(shape.color);
+//   strokeWeight(shape.thickness);
+
+//   stroke(shape.color);
+//   fill(shape.fillColor); // Set the fill color
+//   strokeWeight(shape.thickness);
+
+//   if (shape.type === 'Rectangle') {
+//     rect(shape.x1, shape.y1, shape.x2 - shape.x1, shape.y2 - shape.y1);
+//   } else if (shape.type === 'Ellipse') {
+//     let width = shape.x2 - shape.x1;
+//     let height = shape.y2 - shape.y1;
+//     ellipse(shape.x1 + width / 2, shape.y1 + height / 2, Math.abs(width), Math.abs(height));
+//   }
+
+
+// }
 function drawShape(shape) {
-  stroke(shape.color);
+  // Convert the color strings to p5.Color objects
+  stroke(color(shape.color));
+  fill(color(shape.fillColor));
+
   strokeWeight(shape.thickness);
+
   if (shape.type === 'Rectangle') {
     rect(shape.x1, shape.y1, shape.x2 - shape.x1, shape.y2 - shape.y1);
   } else if (shape.type === 'Ellipse') {
-    ellipse(shape.x1, shape.y1, shape.x2 - shape.x1, shape.y2 - shape.y1);
+    let width = shape.x2 - shape.x1;
+    let height = shape.y2 - shape.y1;
+    ellipse(shape.x1 + width / 2, shape.y1 + height / 2, Math.abs(width), Math.abs(height));
   }
 }
 
-
 //To-do 
+//-Create the image feaure
 //-The ellipse is drawing from the center, not from the corner, change it to draw from the corner
-//-I think this means the fill colour should be for the shape, not the border, what do you think: The user should be able to select the border and fill colour of the shapes being drawn
-//-Border thikness should have 4 options only, not slidebar
 //-When the stamp is selected and hovers over the shape, the stamp is under the shape layer, but when drawing it, it gets drawn over the shape, fix it. 
+//-Create more constants
+//-Move some code to functions
+//-Write header and function comments, inline comments
