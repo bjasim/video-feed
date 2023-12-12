@@ -23,6 +23,8 @@ function preload() {
   stamps[1] = createImg("assets/approved.png").hide();
   stamps[2] = createImg("assets/stamp.png").hide();
   stamps[3] = createImg("assets/best-seller.png").hide();
+  // stamps[4] = createImg("assets/approved.png").hide();
+
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -54,6 +56,7 @@ function setup() {
   stampSelect.option('Stamp 2');
   stampSelect.option('Stamp 3');
   stampSelect.option('Stamp 4');
+  // stampSelect.option('Stamp 5');
   stampSelect.changed(changeStamp);
   createP('Stamp:').position(uiDescription,  145);
   stampSelect.position(uiSelection, 160);
@@ -96,15 +99,21 @@ function draw() {
   background(220);
   image(video, (windowWidth - 640) / 2, (windowHeight - 480) / 2); // Draw the video feed in the center of the canvas
   buffer.image(video, 0, 0); // Draw the video feed onto the buffer
+
+
+    // Apply the selected filter
+    if (filterType === 'INVERT') {
+      buffer.filter(INVERT);
+    } else if (filterType === 'POSTERIZE') {
+      buffer.filter(POSTERIZE, 3);
+    } else if (filterType === 'GRAY') {
+      buffer.filter(GRAY);
+    } else if (filterType === 'BLUR') {
+      buffer.filter(BLUR, 5);
+    }  
+  
   image(buffer, (windowWidth - 640) / 2, (windowHeight - 480) / 2); // Draw the buffer onto the canvas
 
-
-
-  if (currentStamp && mouseX >= (windowWidth - 640) / 2 && mouseX <= (windowWidth + 640) / 2 && mouseY >= (windowHeight - 480) / 2 && mouseY <= (windowHeight + 480) / 2) {
-    image(currentStamp, mouseX - currentStamp.width / 2, mouseY - currentStamp.height / 2);
-  }
-
-  
   for (let item of items) {
     if (item.type === 'stamp') {
       image(item.image, item.x - item.image.width / 2, item.y - item.image.height / 2);
@@ -113,26 +122,12 @@ function draw() {
     }
   }
 
-
-    // Apply the selected filter
-    if (filterType === 'INVERT') {
-      filter(INVERT);
-    } else if (filterType === 'POSTERIZE') {
-      filter(POSTERIZE, 3);
-    } else if (filterType === 'GRAY') {
-      filter(GRAY);
-    } else if (filterType === 'BLUR') {
-      filter(BLUR, 5);
-    }  
-  
-  
-  // for (let item of items) {
-  //   if (item.type === 'stamp' && item.visible) {
-  //     image(item.image, item.x - item.image.width / 2, item.y - item.image.height / 2);
-  //   } else if (item.type === 'Rectangle' || item.type === 'Ellipse') {
-  //     drawShape(item);
-  //   }
-  // }
+  // Draw the current stamp or shape
+  if (currentStamp && mouseX >= (windowWidth - 640) / 2 && mouseX <= (windowWidth + 640) / 2 && mouseY >= (windowHeight - 480) / 2 && mouseY <= (windowHeight + 480) / 2) {
+    image(currentStamp, mouseX - currentStamp.width / 2, mouseY - currentStamp.height / 2);
+  } else if (currentShape) {
+    drawShape(currentShape);
+  }
 
   if (currentShape) {
     drawShape(currentShape);
@@ -145,6 +140,7 @@ function resetSketch() {
   filterSelect.selected('No Filter'); // Reset the filter dropdown menu
   currentStamp = null; // Clear the current stamp
   stampSelect.selected('No Stamp'); // Reset the stamp dropdown menu
+  stampSelect.enable();
   currentTool = null; // Clear the current tool
   toolSelect.selected('No Tool'); // Reset the tool dropdown menu
   currentShape = null; // Clear the current shape
@@ -204,10 +200,15 @@ function mousePressed() {
   }
 
 function mouseDragged() {
-  if (currentShape) {
-    currentShape.x2 = mouseX;
-    currentShape.y2 = mouseY;
+  // if (currentShape) {
+  //   currentShape.x2 = mouseX;
+  //   currentShape.y2 = mouseY;
+  // }
+  if (currentShape && mouseIsPressed) {
+    currentShape.x2 = constrain(mouseX, (windowWidth - 640) / 2, (windowWidth + 640) / 2);
+    currentShape.y2 = constrain(mouseY, (windowHeight - 480) / 2, (windowHeight + 480) / 2);
   }
+
 }
 
 function mouseReleased() {
@@ -223,7 +224,7 @@ function changeTool() {
     currentStamp = null; // Clear the current stamp
     stampSelect.selected('No Stamp'); // Select the 'No Stamp' option in the stamp dropdown menu
     stampSelect.disable(); // Disable the stamp selection
-    stampPreview.remove(); // Remove the stamp preview
+    stampPreview.hide(); // Remove the stamp preview
     stampPreview = null;
   } else {
     stampSelect.enable(); // Enable the stamp selection
@@ -255,11 +256,6 @@ function keyPressed() {
   }
 }
 //To-do 
-//-When the stamp is selected and hovers over the shape, the stamp is under the shape layer, but when drawing it, it gets drawn over the shape, fix it.  ------------------
 //-Create more constants
 //-Write header and function comments, inline comments
-//-Invert filetr is being applied to the whole website
-//-MAYBE - when the shape tool is selected and the user is drawing a shape, 
-// when the mouse passes the video ui and reached the other ui, stop the shape
-// drawing till the border, don't let it drawing even after the border. 
 //- Double the requirements document again and submit
