@@ -14,3 +14,4 @@ Screenshot Capture: If the spacebar is pressed, the script captures the 640x480 
 These features make the sketch.js file a comprehensive script for a video feed application that allows users to interactively modify the video feed by applying filters, placing stamps, and drawing shapes.
 
 
+Link to the preview: https://bjasim.github.io/video-feed/
