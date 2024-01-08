@@ -54,4 +54,4 @@ This Python program allows users to create a "photobooth" experience by editing 
 ## Usage
 
 1. Clone or download this repository to your local machine.
-Link to the preview: https://bjasim.github.io/video-feed/
+2. Link to the preview: https://bjasim.github.io/video-feed/
